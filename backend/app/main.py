@@ -1,12 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.core.config import settings
-from app.core.database import engine
-from app.models import user, habit
-from app.api.endpoints import auth, habits
-
-user.Base.metadata.create_all(bind=engine)
-habit.Base.metadata.create_all(bind=engine)
+import uvicorn
 
 app = FastAPI(title="Habit Tracker API")
 
@@ -18,9 +12,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth.router, prefix="/auth", tags=["auth"])
-app.include_router(habits.router, prefix="/habits", tags=["habits"])
-
 @app.get("/")
 async def root():
-    return {"message": "Habit Tracker API"}
+    return {"message": "Habit Tracker API is running!"}
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy"}
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
